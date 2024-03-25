@@ -4,7 +4,7 @@
   <name>mqtt_ros_bridge</name>
   <version>1.1.0</version>
   <description>MQTT ROS Bridge</description>
-  <maintainer>benjaminwp18</maintainer>
+  <maintainer email="foo@bar.com">benjaminwp18</maintainer>
   <maintainer email="rmc@carlstrom.com">InvincbleRMC</maintainer>
   <license>Apache License 2.0</license>
 
