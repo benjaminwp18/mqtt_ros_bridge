@@ -17,7 +17,7 @@ jobs:
     name: ROS ${{ matrix.ROS_DISTRO }} (${{ matrix.ROS_REPO }})
     runs-on: ubuntu-latest
     strategy:
-      # fail-fast: false # uncomment if failing jobs should not cancel the others immediately
+      fail-fast: false # uncomment if failing jobs should not cancel the others immediately
       matrix: # matrix is the product of entries
         ROS_DISTRO: [humble, iron, rolling]
         ROS_REPO: [main]
