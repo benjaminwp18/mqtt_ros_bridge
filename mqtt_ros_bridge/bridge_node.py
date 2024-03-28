@@ -13,7 +13,8 @@ import paho.mqtt.client as MQTT
 
 @dataclass
 class TopicInfo():
-    """Metadata about a single topic"""
+    """Metadata about a single topic."""
+
     name: str
     publish_on_ros: bool
 
@@ -25,7 +26,7 @@ TOPICS: list[TopicInfo] = [
 
 
 class BridgeNode(Node):
-    """Node to bridge MQTT and ROS"""
+    """Node to bridge MQTT and ROS."""
 
     def __init__(self) -> None:
         super().__init__('mqtt_bridge_node')
@@ -53,14 +54,14 @@ class BridgeNode(Node):
         self.mqtt_client.on_message = self.mqtt_msg_received
 
     def make_ros_receiver(self, topic: str):
-        """
-        Create a callback function for a ROS subscription which re-publishes
-        messages on the same topic in MQTT.
+        """Create a callback function which re-publishes messages on the same topic in MQTT.
 
-        Args:
-            topic (str): the topic that the callback will publish on
-        """
+        Parameters
+        ----------
+        topic : str
+            the topic that the callback will publish on
 
+        """
         def callback(msg: String):
             self.get_logger().info(f"ROS RECEIVED: Topic: '{topic}' Payload: '{msg}'")
             self.mqtt_client.publish(topic, msg.data)
@@ -68,15 +69,18 @@ class BridgeNode(Node):
         return callback
 
     def mqtt_msg_received(self, _client: MQTT.Client, _userdata: Any, mqtt_msg: MQTT.MQTTMessage):
-        """
-        Re-publish messages from MQTT on the same topic in ROS.
+        """Re-publish messages from MQTT on the same topic in ROS.
 
-        Args:
-            _client (Client): unused; the MQTT client which received this message
-            _userdata (Any): unused; the private user data as set for the client
-            mqtt_msg (MQTTMessage): the message received over MQTT
-        """
+        Parameters
+        ----------
+        _client : MQTT.Client
+            unused; the MQTT client which received this message
+        _userdata : Any
+            unused; the private user data as set for the client
+        mqtt_msg : MQTT.MQTTMessage
+            the message received over MQTT
 
+        """
         self.get_logger().info(
             f"MQTT RECEIVED: Topic: '{mqtt_msg.topic}' Payload: '{mqtt_msg.payload!r}'")
 
@@ -86,7 +90,7 @@ class BridgeNode(Node):
 
 
 def main(args=None):
-    """Main entrypoint for ROS executable"""
+    """Run bridge node; used in ROS executable."""
 
     rclpy.init(args=args)
 
