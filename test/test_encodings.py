@@ -5,7 +5,7 @@ from mqtt_ros_bridge.encodings import human_readable_encoding, human_readable_de
 
 
 def encodings_helper(msg: MsgLikeT) -> MsgLikeT:
-    assert human_readable_decoding(human_readable_encoding(msg), type(MsgLikeT)) == msg
+    assert human_readable_decoding(human_readable_encoding(msg), type(msg)) == msg
 
 
 def test_encodings() -> None:
