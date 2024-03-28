@@ -52,7 +52,6 @@ class BridgeNode(Node):
 
         self.mqtt_client.on_message = self.mqtt_msg_received
 
-
     def make_ros_receiver(self, topic: str):
         """
         Create a callback function for a ROS subscription which re-publishes
@@ -67,7 +66,6 @@ class BridgeNode(Node):
             self.mqtt_client.publish(topic, msg.data)
 
         return callback
-
 
     def mqtt_msg_received(self, _client: MQTT.Client, _userdata: Any, mqtt_msg: MQTT.MQTTMessage):
         """
