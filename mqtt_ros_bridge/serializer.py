@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from rclpy.serialization import serialize_message, deserialize_message
 
+
 class Serializer(ABC):
     """Serializes and deserializes ROS messages for transmission over MQTT."""
 

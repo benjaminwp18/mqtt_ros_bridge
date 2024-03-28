@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, TypeVar, Callable, Generic
 from dataclasses import dataclass
 
 import rclpy
@@ -14,12 +14,15 @@ import paho.mqtt.client as MQTT
 from mqtt_ros_bridge.serializer import Serializer, ROSDefaultSerializer
 
 
+T = TypeVar('T')
+
+
 @dataclass
-class TopicInfo():
+class TopicInfo(Generic[T]):
     """Metadata about a single topic."""
 
     name: str
-    msg_type: Any
+    msg_type: T
     serializer: type[Serializer]
     publish_on_ros: bool
 
@@ -62,7 +65,7 @@ class BridgeNode(Node):
 
         self.mqtt_client.on_message = self.mqtt_callback
 
-    def make_ros_callback(self, topic_info: TopicInfo):
+    def make_ros_callback(self, topic_info: TopicInfo[T]) -> Callable[[T], None]:
         """
         Create a callback function which re-publishes messages on the same topic in MQTT.
 
@@ -72,13 +75,14 @@ class BridgeNode(Node):
             information about the topic that the callback will publish on
 
         """
-        def callback(msg: topic_info.msg_type):
+        def callback(msg: T) -> None:
             self.get_logger().info(f'ROS RECEIVED: Topic: "{topic_info.name}" Payload: "{msg}"')
             self.mqtt_client.publish(topic_info.name, topic_info.serializer.serialize(msg))
 
         return callback
 
-    def mqtt_callback(self, _client: MQTT.Client, _userdata: Any, mqtt_msg: MQTT.MQTTMessage):
+    def mqtt_callback(self, _client: MQTT.Client,
+                      _userdata: Any, mqtt_msg: MQTT.MQTTMessage) -> None:
         """
         Re-publish messages from MQTT on the same topic in ROS.
 
@@ -101,7 +105,7 @@ class BridgeNode(Node):
             ros_msg = topic_info.serializer.deserialize(mqtt_msg.payload, topic_info.msg_type)
         except RMWError:
             self.get_logger().info('Dropping message with bad serialization received' +
-                f'from MQTT on topic "{mqtt_msg.topic}": "{mqtt_msg.payload!r}"')
+                                   f'from MQTT on topic "{mqtt_msg.topic}": "{mqtt_msg.payload!r}"')
             return
 
         self.ros_publishers[topic_info.name].publish(ros_msg)
