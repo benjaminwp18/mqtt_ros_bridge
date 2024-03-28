@@ -1,10 +1,10 @@
-from typing import Protocol, Type, TypeVar, NoReturn
+from typing import Protocol, Type, TypeVar, NoReturn, TypeAlias
 
 import json
 from rclpy.type_support import check_is_valid_msg_type
 
 
-NestedDictionary = dict[str, 'NestedDictionary'] | dict[str, str] | dict[str, NoReturn]
+NestedDictionary: TypeAlias = dict[str, 'NestedDictionary'] | dict[str, str] | dict[str, NoReturn]
 
 
 class MsgLike(Protocol):
