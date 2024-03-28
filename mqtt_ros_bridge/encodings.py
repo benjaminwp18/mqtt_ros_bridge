@@ -24,11 +24,14 @@ MsgLikeT = TypeVar("MsgLikeT", bound=MsgLike)
 RESERVED_FIELD_TYPE = '_msgs/'
 ENCODING = 'latin-1'
 
+
 def numpy_encoding(array: NDArray) -> list:
     return [int(x) for x in array]
 
+
 def numpy_decoding(ls: list) -> NDArray:
     return array(ls)
+
 
 def human_readable_encoding(msg: MsgLike) -> bytes:
     check_is_valid_msg_type(type(msg))
@@ -50,14 +53,12 @@ def human_readable_encoding_recursive(msg: MsgLike) -> NestedDictionary:
             if isinstance(value[0], bytes):
                 value = cast(list[bytes], value)
                 value = [byte.decode(ENCODING) for byte in value]
+            elif RESERVED_FIELD_TYPE in field_types:
+                value = [human_readable_encoding_recursive(msg_in_list) for msg_in_list in value]
         elif isinstance(value, ndarray):
             value = numpy_encoding(value)
         elif RESERVED_FIELD_TYPE in field_types:
-            if isinstance(value, list):
-                print("hi")
-                value = [human_readable_encoding_recursive(msg_in_list) for msg_in_list in value]
-            else:
-                value = human_readable_encoding_recursive(value)
+            value = human_readable_encoding_recursive(value)
         msg_dict[field] = value
 
     return msg_dict
@@ -67,9 +68,7 @@ def human_readable_decoding(byte_msg: bytes, msg_type: Type[MsgLikeT]) -> MsgLik
     check_is_valid_msg_type(msg_type)
 
     str_msg = byte_msg.decode()
-
     msg_dict = json.loads(str_msg)
-
     return human_readable_decoding_recursive(msg_dict, msg_type)
 
 
@@ -92,7 +91,5 @@ def human_readable_decoding_recursive(msg_dict: NestedDictionary,
 from test_msgs.msg import Arrays
 
 # print(Arrays())
-
-
 
 print(human_readable_decoding(human_readable_encoding(Arrays()), Arrays))
