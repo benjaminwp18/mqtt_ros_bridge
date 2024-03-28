@@ -28,7 +28,7 @@ def human_readable_encoding(msg: MsgLike) -> bytes:
 
 def human_readable_encoding_recursive(msg: MsgLike) -> NestedDictionary:
     msg_dict: NestedDictionary = {}
-    for field, field_types in msg.get_fields_and_field_types().items():
+    for field, field_types in (msg.get_fields_and_field_types()).items():
         value = getattr(msg, field)
 
         if isinstance(value, bytes):
@@ -56,7 +56,8 @@ def human_readable_decoding_recursive(msg_dict: NestedDictionary,
 
     for field, value in msg_dict.items():
         if isinstance(getattr(msg, field), bytes):
-            value = value.encode()
+            if isinstance(value, str):
+                value = value.encode()
         elif isinstance(value, dict):
             value = human_readable_decoding_recursive(value, type(getattr(msg, field)))
 
