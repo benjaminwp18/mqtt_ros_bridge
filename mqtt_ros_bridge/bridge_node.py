@@ -54,7 +54,8 @@ class BridgeNode(Node):
         self.mqtt_client.on_message = self.mqtt_msg_received
 
     def make_ros_receiver(self, topic: str):
-        """Create a callback function which re-publishes messages on the same topic in MQTT.
+        """
+        Create a callback function which re-publishes messages on the same topic in MQTT.
 
         Parameters
         ----------
@@ -69,7 +70,8 @@ class BridgeNode(Node):
         return callback
 
     def mqtt_msg_received(self, _client: MQTT.Client, _userdata: Any, mqtt_msg: MQTT.MQTTMessage):
-        """Re-publish messages from MQTT on the same topic in ROS.
+        """
+        Re-publish messages from MQTT on the same topic in ROS.
 
         Parameters
         ----------
@@ -91,7 +93,6 @@ class BridgeNode(Node):
 
 def main(args=None):
     """Run bridge node; used in ROS executable."""
-
     rclpy.init(args=args)
 
     bridge_node = BridgeNode()
