@@ -12,7 +12,6 @@ def generate_launch_description() -> LaunchDescription:
         Launches bridge_node.
 
     """
-
     run_bridge_node = Node(
         package='mqtt_ros_bridge',
         executable='bridge_node',
