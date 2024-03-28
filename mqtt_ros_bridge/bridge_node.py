@@ -104,8 +104,8 @@ class BridgeNode(Node):
         try:
             ros_msg = topic_info.serializer.deserialize(mqtt_msg.payload, topic_info.msg_type)
         except RMWError:
-            self.get_logger().info('Dropping message with bad serialization received' +
-                                   f'from MQTT on topic "{mqtt_msg.topic}": "{mqtt_msg.payload!r}"')
+            self.get_logger().info('Dropping message with bad serialization received from' +
+                                   f'MQTT on topic "{mqtt_msg.topic}": "{mqtt_msg.payload!r}"')
             return
 
         self.ros_publishers[topic_info.name].publish(ros_msg)
