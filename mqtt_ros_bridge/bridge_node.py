@@ -18,6 +18,7 @@ class TopicInfo(Generic[MsgLikeT]):
 
     name: str
     msg_type: Type[MsgLikeT]
+    # Should Serializer also be generic across MsgLikeT?
     serializer: type[Serializer]
     publish_on_ros: bool
 
