@@ -7,7 +7,7 @@ from numpy import ndarray
 from numpy.typing import NDArray
 from rclpy.type_support import check_is_valid_msg_type
 
-NestedDictionary: TypeAlias = dict[str, 'NestedDictionary'] | dict[str, object]
+NestedDictionary: TypeAlias = dict[str, object]
 
 
 class MsgLike(Protocol):
