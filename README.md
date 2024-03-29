@@ -29,3 +29,9 @@ you@ubuntu:~ $ service mosquitto status
    CGroup: /system.slice/mosquitto.service
            └─5390 /usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
 ```
+
+## TODO
+ - Set QOS
+ - Human readable serialization
+ - Load topic config from file
+ - How to handle duplex topics?
