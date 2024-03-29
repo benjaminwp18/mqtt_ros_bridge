@@ -3,7 +3,7 @@ from array import array
 from typing import (Iterable, MutableSequence, Protocol, Type, TypeAlias,
                     TypeVar, cast)
 
-from numpy import ndarray, floating, integer
+from numpy import floating, integer, ndarray
 from numpy.typing import NDArray
 from rclpy.type_support import check_is_valid_msg_type
 

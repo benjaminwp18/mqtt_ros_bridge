@@ -1,28 +1,23 @@
-from typing import Any, TypeVar, Callable, Generic
 from dataclasses import dataclass
+from typing import Any, Callable, Generic, Type
 
+import paho.mqtt.client as MQTT
 import rclpy
+from mqtt_ros_bridge.encodings import MsgLikeT
+from mqtt_ros_bridge.serializer import ROSDefaultSerializer, Serializer
+from rclpy._rclpy_pybind11 import RMWError
 from rclpy.node import Node
 from rclpy.publisher import Publisher
 from rclpy.subscription import Subscription
-from rclpy._rclpy_pybind11 import RMWError
-
 from std_msgs.msg import String
-
-import paho.mqtt.client as MQTT
-
-from mqtt_ros_bridge.serializer import Serializer, ROSDefaultSerializer
-
-
-T = TypeVar('T')
 
 
 @dataclass
-class TopicInfo(Generic[T]):
+class TopicInfo(Generic[MsgLikeT]):
     """Metadata about a single topic."""
 
     name: str
-    msg_type: T
+    msg_type: Type[MsgLikeT]
     serializer: type[Serializer]
     publish_on_ros: bool
 
@@ -65,7 +60,7 @@ class BridgeNode(Node):
 
         self.mqtt_client.on_message = self.mqtt_callback
 
-    def make_ros_callback(self, topic_info: TopicInfo[T]) -> Callable[[T], None]:
+    def make_ros_callback(self, topic_info: TopicInfo[MsgLikeT]) -> Callable[[MsgLikeT], None]:
         """
         Create a callback function which re-publishes messages on the same topic in MQTT.
 
@@ -75,7 +70,7 @@ class BridgeNode(Node):
             information about the topic that the callback will publish on
 
         """
-        def callback(msg: T) -> None:
+        def callback(msg: MsgLikeT) -> None:
             self.get_logger().info(f'ROS RECEIVED: Topic: "{topic_info.name}" Payload: "{msg}"')
             self.mqtt_client.publish(topic_info.name, topic_info.serializer.serialize(msg))
 
