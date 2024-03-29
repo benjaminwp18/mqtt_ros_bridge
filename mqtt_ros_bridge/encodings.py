@@ -1,9 +1,9 @@
 import json
 from array import array
-from typing import (Any, Iterable, MutableSequence, Protocol, Type, TypeAlias,
+from typing import (Iterable, MutableSequence, Protocol, Type, TypeAlias,
                     TypeVar, cast)
 
-from numpy import ndarray
+from numpy import ndarray, floating, integer
 from numpy.typing import NDArray
 from rclpy.type_support import check_is_valid_msg_type
 
@@ -21,13 +21,15 @@ class MsgLike(Protocol):
 MsgLikeT = TypeVar("MsgLikeT", bound=MsgLike)
 ArrayElementT = TypeVar('ArrayElementT', int, float, str)
 
-
 RESERVED_FIELD_TYPE = '/'
 ENCODING = 'latin-1'
 
 
-def numpy_encoding(array_arg: NDArray[Any]) -> list[int]:
-    return [int(x) for x in array_arg]
+def numpy_encoding(array_arg: NDArray[integer] | NDArray[floating]) -> list[int] | list[float]:
+    if isinstance(array_arg[0], integer):
+        return [int(x) for x in array_arg]
+    else:
+        return [float(x) for x in array_arg]
 
 
 def array_encoding(array_arg: MutableSequence[ArrayElementT]) -> list[ArrayElementT]:
