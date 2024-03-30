@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Type
 
-from mqtt_ros_bridge.encodings import (MsgLike, MsgLikeT,
-                                       human_readable_decoding,
-                                       human_readable_encoding)
 from rclpy.serialization import deserialize_message, serialize_message
+
+from mqtt_ros_bridge.json_serializer import json_deserialize, json_serialize
+from mqtt_ros_bridge.msg_typing import MsgLike, MsgLikeT
 
 
 class Serializer(ABC):
@@ -61,13 +61,13 @@ class ROSDefaultSerializer(Serializer):
         return deserialize_message(serialized_message, message_type)
 
 
-class HumanReadableSerializer(Serializer):
+class JSONSerializer(Serializer):
     """Serialize and deserialize messages using the default ROS message serializer."""
 
     @staticmethod
     def serialize(message: MsgLike) -> bytes:
-        return human_readable_encoding(message)
+        return json_serialize(message)
 
     @staticmethod
     def deserialize(serialized_message: bytes, message_type: Type[MsgLikeT]) -> MsgLikeT:
-        return human_readable_decoding(serialized_message, message_type)
+        return json_deserialize(serialized_message, message_type)
