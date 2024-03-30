@@ -32,6 +32,5 @@ you@ubuntu:~ $ service mosquitto status
 
 ## TODO
  - Set QOS
- - Human readable serialization
  - Load topic config from file
  - How to handle duplex topics?
