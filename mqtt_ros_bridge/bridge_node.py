@@ -3,13 +3,15 @@ from typing import Any, Callable, Generic, Type
 
 import paho.mqtt.client as MQTT
 import rclpy
-from mqtt_ros_bridge.encodings import MsgLikeT
-from mqtt_ros_bridge.serializer import ROSDefaultSerializer, Serializer
+
 from rclpy._rclpy_pybind11 import RMWError
 from rclpy.node import Node
 from rclpy.publisher import Publisher
 from rclpy.subscription import Subscription
 from std_msgs.msg import String
+
+from mqtt_ros_bridge.json_serializer import MsgLikeT
+from mqtt_ros_bridge.serializer import ROSDefaultSerializer, Serializer
 
 
 @dataclass
