@@ -3,7 +3,7 @@ from test_msgs.msg import (Arrays, BasicTypes, BoundedPlainSequences, BoundedSeq
                            WStrings)
 
 from mqtt_ros_bridge.msg_typing import MsgLikeT
-from mqtt_ros_bridge.serializer import Serializer, ROSDefaultSerializer, HumanReadableSerializer
+from mqtt_ros_bridge.serializer import Serializer, ROSDefaultSerializer, JSONSerializer
 
 
 messages = [
@@ -48,4 +48,4 @@ def test_serializers() -> None:
     """Test that serialization works."""
     for message in messages:
         serialize_checker(message, ROSDefaultSerializer)
-        serialize_checker(message, HumanReadableSerializer)
+        serialize_checker(message, JSONSerializer)

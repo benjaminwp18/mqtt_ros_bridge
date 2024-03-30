@@ -61,7 +61,7 @@ class ROSDefaultSerializer(Serializer):
         return deserialize_message(serialized_message, message_type)
 
 
-class HumanReadableSerializer(Serializer):
+class JSONSerializer(Serializer):
     """Serialize and deserialize messages using the default ROS message serializer."""
 
     @staticmethod
