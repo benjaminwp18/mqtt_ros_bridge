@@ -34,3 +34,6 @@ you@ubuntu:~ $ service mosquitto status
  - Set QOS
  - Load topic config from file
  - How to handle duplex topics?
+ - Services.
+ - Dynamic topic advertising
+ - Actions.
