@@ -15,7 +15,10 @@ setup(
         ('share/' + PACKAGE_NAME, ['package.xml']),
         # Include all launch files.
         (os.path.join('share', PACKAGE_NAME, 'launch'),
-         glob('launch/*launch.[pxy][yma]*'))
+         glob('launch/*launch.[pxy][yma]*')),
+        # Include all config files.
+        (os.path.join('share', PACKAGE_NAME, 'config'),
+         glob('config/*'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,

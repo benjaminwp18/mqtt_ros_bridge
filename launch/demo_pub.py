@@ -1,0 +1,38 @@
+import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch.actions import SetEnvironmentVariable
+from launch.launch_description import LaunchDescription
+from launch_ros.actions import Node
+
+
+def generate_launch_description() -> LaunchDescription:
+    """
+    Generate LaunchDescription for MQTT ROS bridge.
+
+    Returns
+    -------
+    LaunchDescription
+        Launches bridge_node.
+
+    """
+
+    config = os.path.join(
+        get_package_share_directory('mqtt_ros_bridge'),
+        'config',
+        'pub.yaml'
+        )
+
+    run_bridge_node = Node(
+        package='mqtt_ros_bridge',
+        executable='bridge_node',
+        name='demo_bridge_pub',
+        emulate_tty=True,
+        output='screen',
+        parameters=[config]
+    )
+
+    return LaunchDescription([
+        SetEnvironmentVariable("ROS_DOMAIN_ID", "2"),
+        run_bridge_node
+    ])

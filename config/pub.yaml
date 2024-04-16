@@ -1,0 +1,5 @@
+demo_bridge_pub:
+  ros__parameters:
+    pub1: 
+      topic: "hi"
+      

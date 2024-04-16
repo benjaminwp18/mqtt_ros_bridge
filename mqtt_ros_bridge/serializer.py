@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Type
 
 from rclpy.serialization import deserialize_message, serialize_message
 
@@ -30,7 +29,7 @@ class Serializer(ABC):
 
     @staticmethod
     @abstractmethod
-    def deserialize(serialized_message: bytes, message_type: Type[MsgLikeT]) -> MsgLikeT:
+    def deserialize(serialized_message: bytes, message_type: type[MsgLikeT]) -> MsgLikeT:
         """
         Deserialize the provided bytes into a ROS message of the provided type.
 
@@ -57,7 +56,7 @@ class ROSDefaultSerializer(Serializer):
         return serialize_message(message)
 
     @staticmethod
-    def deserialize(serialized_message: bytes, message_type: Type[MsgLikeT]) -> MsgLikeT:
+    def deserialize(serialized_message: bytes, message_type: type[MsgLikeT]) -> MsgLikeT:
         return deserialize_message(serialized_message, message_type)
 
 
@@ -69,5 +68,5 @@ class JSONSerializer(Serializer):
         return json_serialize(message)
 
     @staticmethod
-    def deserialize(serialized_message: bytes, message_type: Type[MsgLikeT]) -> MsgLikeT:
+    def deserialize(serialized_message: bytes, message_type: type[MsgLikeT]) -> MsgLikeT:
         return json_deserialize(serialized_message, message_type)

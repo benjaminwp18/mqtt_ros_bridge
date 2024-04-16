@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Generic, Type
+from typing import Any, Callable, Generic
 
 import paho.mqtt.client as MQTT
 import rclpy
@@ -7,11 +7,11 @@ import rclpy
 from rclpy._rclpy_pybind11 import RMWError
 from rclpy.node import Node
 from rclpy.publisher import Publisher
-from rclpy.subscription import Subscription
 from std_msgs.msg import String
 
 from mqtt_ros_bridge.msg_typing import MsgLikeT
 from mqtt_ros_bridge.serializer import ROSDefaultSerializer, Serializer
+from mqtt_ros_bridge.util import lookup_object
 
 
 @dataclass
@@ -19,14 +19,15 @@ class TopicInfo(Generic[MsgLikeT]):
     """Metadata about a single topic."""
 
     name: str
-    msg_type: Type[MsgLikeT]
+    msg_type: type[MsgLikeT]
     # Should Serializer also be generic across MsgLikeT?
     serializer: type[Serializer]
     publish_on_ros: bool
 
 
 TOPICS: dict[str, TopicInfo] = {
-    '/turtle1/cmd_vel': TopicInfo('/turtle1/cmd_vel', String, ROSDefaultSerializer, False),
+    '/turtle1/cmd_vel': TopicInfo('/turtle1/cmd_vel', lookup_object("std_msgs.msg:String"),
+                                  ROSDefaultSerializer, False),
     # 'sub_topic': TopicInfo('sub_topic', String, ROSDefaultSerializer, False)
 }
 
@@ -40,6 +41,9 @@ class BridgeNode(Node):
     def __init__(self) -> None:
         super().__init__('mqtt_bridge_node')
 
+        # TODO get from parameters
+        DEBUG = True
+
         self.get_logger().info('Creating MQTT ROS bridge node')
 
         self.mqtt_client = MQTT.Client()
@@ -48,18 +52,17 @@ class BridgeNode(Node):
         self.mqtt_client.loop_start()
 
         self.ros_publishers: dict[str, Publisher] = {}
-        self.ros_subscriptions: list[Subscription] = []
 
         for topic_info in TOPICS.values():
+            print(topic_info.msg_type)
             if topic_info.publish_on_ros:
                 publisher = self.create_publisher(topic_info.msg_type, topic_info.name, 10)
                 self.ros_publishers[topic_info.name] = publisher
                 self.mqtt_client.subscribe(topic_info.name)
             else:
                 callback = self.make_ros_callback(topic_info)
-                subscription = self.create_subscription(
-                    topic_info.msg_type, topic_info.name, callback, 10)
-                self.ros_subscriptions.append(subscription)
+                # TODO proper QOS?
+                self.create_subscription(topic_info.msg_type, topic_info.name, callback, 10)
 
         self.mqtt_client.on_message = self.mqtt_callback
 
