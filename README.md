@@ -37,3 +37,4 @@ you@ubuntu:~ $ service mosquitto status
  - Services.
  - Dynamic topic advertising
  - Actions.
+ - TopicInfo Hashable Key
