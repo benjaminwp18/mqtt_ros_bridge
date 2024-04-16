@@ -38,3 +38,5 @@ you@ubuntu:~ $ service mosquitto status
  - Dynamic topic advertising
  - Actions.
  - TopicInfo Hashable Key
+ - Import MsgLike properly
+ - Connection success message
