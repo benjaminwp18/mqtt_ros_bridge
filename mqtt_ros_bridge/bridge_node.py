@@ -50,7 +50,7 @@ class BridgeNode(Node):
         super().__init__('mqtt_bridge_node')
 
         # TODO get from parameters
-        DEBUG = True
+        # DEBUG = True
 
         print(args)
 

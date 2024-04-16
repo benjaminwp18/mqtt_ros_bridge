@@ -16,7 +16,6 @@ def generate_launch_description() -> LaunchDescription:
         Launches bridge_node.
 
     """
-
     config = os.path.join(
         get_package_share_directory('mqtt_ros_bridge'),
         'config',
