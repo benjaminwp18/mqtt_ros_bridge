@@ -1,13 +1,21 @@
 from importlib import import_module
-from typing import Optional
+from typing import Optional, cast
 
 import yaml
 from rcl_interfaces.msg import Parameter as ParameterMsg
 from rcl_interfaces.msg import ParameterType, ParameterValue
 from rclpy.parameter import PARAMETER_SEPARATOR_STRING, Parameter
 
+from mqtt_ros_bridge.msg_typing import MsgLike
 
-def lookup_object(object_path: str, package: str = 'mqtt_ros_bridge') -> object:
+
+def lookup_message(object_path: str, package: str = 'mqtt_ros_bridge') -> MsgLike:
+    """ lookup message from a some.module:object_name specification. """
+
+    return cast(MsgLike, _lookup_object(object_path, package))
+
+
+def _lookup_object(object_path: str, package: str = 'mqtt_ros_bridge') -> object:
     """ lookup object from a some.module:object_name specification. """
     module_name, obj_name = object_path.split(":")
     module = import_module(module_name, package)
@@ -154,7 +162,9 @@ def parameter_dict_from_yaml_file(
         return new_dictionary
 
 
-def _unpack_parameter_dict(namespace, parameter_dict):
+def _unpack_parameter_dict(namespace: str,
+                           parameter_dict: dict[str, ParameterMsg]
+                           ) -> dict[str, ParameterMsg]:
     """
     Flatten a parameter dictionary recursively.
 
