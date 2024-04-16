@@ -26,13 +26,20 @@ def generate_launch_description() -> LaunchDescription:
     run_bridge_node = Node(
         package='mqtt_ros_bridge',
         executable='bridge_node',
-        name='demo_bridge_pub',
         emulate_tty=True,
         output='screen',
         parameters=[config]
     )
 
+    turtle_sim = Node(
+        package='turtlesim',
+        executable='turtlesim_node',
+        emulate_tty=True,
+        output='screen'
+    )
+
     return LaunchDescription([
         SetEnvironmentVariable("ROS_DOMAIN_ID", "2"),
-        run_bridge_node
+        run_bridge_node,
+        turtle_sim
     ])
