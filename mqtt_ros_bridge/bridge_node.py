@@ -10,7 +10,7 @@ from rclpy.publisher import Publisher
 from rclpy.subscription import Subscription
 from std_msgs.msg import String
 
-from mqtt_ros_bridge.json_serializer import MsgLikeT
+from mqtt_ros_bridge.msg_typing import MsgLikeT
 from mqtt_ros_bridge.serializer import ROSDefaultSerializer, Serializer
 
 
@@ -26,8 +26,8 @@ class TopicInfo(Generic[MsgLikeT]):
 
 
 TOPICS: dict[str, TopicInfo] = {
-    'pub_topic': TopicInfo('pub_topic', String, ROSDefaultSerializer, True),
-    'sub_topic': TopicInfo('sub_topic', String, ROSDefaultSerializer, False)
+    '/turtle1/cmd_vel': TopicInfo('/turtle1/cmd_vel', String, ROSDefaultSerializer, False),
+    # 'sub_topic': TopicInfo('sub_topic', String, ROSDefaultSerializer, False)
 }
 
 MQTT_PORT = 1883
