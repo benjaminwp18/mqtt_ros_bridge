@@ -28,7 +28,7 @@ def generate_launch_description() -> LaunchDescription:
         executable='bridge_node',
         emulate_tty=True,
         output='screen',
-        parameters=[config]
+        arguments=[config]
     )
 
     turtle_sim = Node(
