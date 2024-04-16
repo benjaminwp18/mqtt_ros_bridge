@@ -7,7 +7,6 @@ import rclpy
 from rclpy._rclpy_pybind11 import RMWError
 from rclpy.node import Node
 from rclpy.publisher import Publisher
-from std_msgs.msg import String
 
 from mqtt_ros_bridge.msg_typing import MsgLikeT
 from mqtt_ros_bridge.serializer import ROSDefaultSerializer, Serializer
