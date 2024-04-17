@@ -10,7 +10,6 @@
 
   <depend>rclpy</depend>
   <depend>python3-paho-mqtt</depend>
-  <depend>python3-yaml</depend>
 
   <exec_depend>ros2launch</exec_depend>
   <exec_depend>std_msgs</exec_depend>

@@ -6,12 +6,13 @@ import paho.mqtt.client as MQTT
 import rclpy
 from rclpy._rclpy_pybind11 import RMWError
 from rclpy.node import Node
+from rclpy.parameter import Parameter, parameter_dict_from_yaml_file
 from rclpy.publisher import Publisher
 
 from mqtt_ros_bridge.msg_typing import MsgLikeT
 from mqtt_ros_bridge.serializer import (JSONSerializer, ROSDefaultSerializer,
                                         Serializer)
-from mqtt_ros_bridge.util import lookup_message, parameter_dict_from_yaml_file
+from mqtt_ros_bridge.util import lookup_message
 
 
 class TopicInfoMsg(Generic[MsgLikeT]):
@@ -88,7 +89,11 @@ class BridgeNode(Node):
         config = os.path.expanduser(config)
         topic_infos: dict[str, TopicInfoMsg] = {}
 
-        params = parameter_dict_from_yaml_file(config)
+        params: dict[str, Parameter] = {}
+        dictionary = parameter_dict_from_yaml_file(config)
+
+        for key, parameter_msg in dictionary.items():
+            params[key] = Parameter.from_parameter_msg(parameter_msg)
 
         unique_names: set[str] = set()
         for names in params.keys():
