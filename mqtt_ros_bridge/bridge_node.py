@@ -81,8 +81,7 @@ class BridgeNode(Node):
         self.mqtt_client.on_message = self.mqtt_callback
 
     def topic_info_from_parameters(self, config: str) -> dict[str, TopicMsgInfo]:
-        """Takes a path to a config file and returns a TopicMsgInfo dictionary."""
-
+        """Take a path to a config file and returns a TopicMsgInfo dictionary."""
         config = os.path.expanduser(config)
         topic_infos: dict[str, TopicMsgInfo] = {}
 
