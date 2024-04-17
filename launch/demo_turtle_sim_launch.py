@@ -16,20 +16,6 @@ def generate_launch_description() -> LaunchDescription:
         Launches bridge_node.
 
     """
-    config = os.path.join(
-        get_package_share_directory('mqtt_ros_bridge'),
-        'config',
-        'pub.yaml'
-        )
-
-    run_bridge_node = Node(
-        package='mqtt_ros_bridge',
-        executable='bridge_node',
-        emulate_tty=True,
-        output='screen',
-        arguments=[config]
-    )
-
     turtle_sim = Node(
         package='turtlesim',
         executable='turtlesim_node',
@@ -39,6 +25,5 @@ def generate_launch_description() -> LaunchDescription:
 
     return LaunchDescription([
         SetEnvironmentVariable("ROS_DOMAIN_ID", "2"),
-        run_bridge_node,
         turtle_sim
     ])
