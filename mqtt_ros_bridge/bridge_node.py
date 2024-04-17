@@ -10,12 +10,11 @@ from rclpy.parameter import Parameter, parameter_dict_from_yaml_file
 from rclpy.publisher import Publisher
 
 from mqtt_ros_bridge.msg_typing import MsgLikeT
-from mqtt_ros_bridge.serializer import (JSONSerializer, ROSDefaultSerializer,
-                                        Serializer)
+from mqtt_ros_bridge.serializer import JSONSerializer, ROSDefaultSerializer
 from mqtt_ros_bridge.util import lookup_message
 
 
-class TopicInfoMsg(Generic[MsgLikeT]):
+class TopicMsgInfo(Generic[MsgLikeT]):
     """Metadata about a single topic."""
 
     def __init__(self, topic: str, msg_object_path: str,
@@ -24,11 +23,7 @@ class TopicInfoMsg(Generic[MsgLikeT]):
         self.topic = topic
         self.msg_type: MsgLikeT = cast(MsgLikeT, lookup_message(msg_object_path))
         self.publish_on_ros = publish_on_ros
-
-        if use_ros_serializer:
-            self.serializer: type[Serializer] = ROSDefaultSerializer
-        else:
-            self.serializer = JSONSerializer
+        self.serializer = ROSDefaultSerializer if use_ros_serializer else JSONSerializer
 
     def __str__(self) -> str:
         return (f"Topic: {self.topic}, Message Type: {self.msg_type}, Publish on ROS:"
@@ -84,10 +79,10 @@ class BridgeNode(Node):
 
         self.mqtt_client.on_message = self.mqtt_callback
 
-    def topic_info_from_parameters(self, config: str) -> dict[str, TopicInfoMsg]:
+    def topic_info_from_parameters(self, config: str) -> dict[str, TopicMsgInfo]:
 
         config = os.path.expanduser(config)
-        topic_infos: dict[str, TopicInfoMsg] = {}
+        topic_infos: dict[str, TopicMsgInfo] = {}
 
         params: dict[str, Parameter] = {}
         dictionary = parameter_dict_from_yaml_file(config)
@@ -107,7 +102,7 @@ class BridgeNode(Node):
             else:
                 ros_serialiser = False
 
-            topic_infos[params[f"{name}.{PARAMETER_TOPIC}"].value] = (TopicInfoMsg(
+            topic_infos[params[f"{name}.{PARAMETER_TOPIC}"].value] = (TopicMsgInfo(
                 params[f"{name}.{PARAMETER_TOPIC}"].value,
                 params[f"{name}.{PARAMETER_TYPE}"].value,
                 params[f"{name}.{PARAMETER_PUBLISH_ON_ROS}"].value,
@@ -116,13 +111,13 @@ class BridgeNode(Node):
 
         return topic_infos
 
-    def make_ros_callback(self, topic_info: TopicInfoMsg[MsgLikeT]) -> Callable[[MsgLikeT], None]:
+    def make_ros_callback(self, topic_info: TopicMsgInfo[MsgLikeT]) -> Callable[[MsgLikeT], None]:
         """
         Create a callback function which re-publishes messages on the same topic in MQTT.
 
         Parameters
         ----------
-        topic_info : TopicInfoMsg
+        topic_info : TopicMsgInfo
             information about the topic that the callback will publish on
 
         """
