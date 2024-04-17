@@ -98,7 +98,6 @@ class BridgeNode(Node):
             unique_names.add(names.split(".")[0])
 
         for name in unique_names:
-
             if params.get(f"{name}.{PARAMETER_USE_ROS_SERIALIZER}", None):
                 ros_serialiser = params[f"{name}.{PARAMETER_USE_ROS_SERIALIZER}"].value
             else:
