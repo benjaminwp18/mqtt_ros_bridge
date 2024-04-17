@@ -1,5 +1,3 @@
-import os
-
 from launch.actions import SetEnvironmentVariable
 from launch.launch_description import LaunchDescription
 from launch_ros.actions import Node
