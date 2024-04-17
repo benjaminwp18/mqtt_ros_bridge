@@ -6,6 +6,7 @@ import paho.mqtt.client as MQTT
 import rclpy
 from rclpy._rclpy_pybind11 import RMWError
 from rclpy.node import Node
+# TODO this breaks humble
 from rclpy.parameter import Parameter, parameter_dict_from_yaml_file
 from rclpy.publisher import Publisher
 
