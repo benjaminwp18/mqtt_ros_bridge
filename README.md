@@ -32,11 +32,9 @@ you@ubuntu:~ $ service mosquitto status
 
 ## TODO
  - Set QOS
- - Load topic config from file
  - How to handle duplex topics?
- - Services.
+ - Services
  - Dynamic topic advertising
- - Actions.
+ - Actions
  - TopicInfo Hashable Key
- - Import MsgLike properly
  - Connection success message
