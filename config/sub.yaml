@@ -3,7 +3,7 @@ mqtt_ros_bridge:
     turtle_pub: 
       topic: "/turtle1/cmd_vel"
       type: "geometry_msgs.msg:Twist"
-      interaction_type: "ros_publisher"
+      interaction_type: "ros_subscriber"
     
     # server: 
     #   topic: "serverice"
@@ -14,5 +14,5 @@ mqtt_ros_bridge:
     yippee: 
       topic: "foo"
       type: "std_msgs.msg:String"
-      interaction_type: "ros_publisher"
+      interaction_type: "ros_subscriber"
       use_ros_serializer: True

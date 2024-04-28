@@ -8,6 +8,7 @@ import paho.mqtt.client as MQTT
 import rclpy
 from rclpy._rclpy_pybind11 import RMWError
 from rclpy.node import Node
+from rclpy.client import Client
 # TODO this breaks humble
 from rclpy.parameter import Parameter, parameter_dict_from_yaml_file
 from rclpy.publisher import Publisher
@@ -56,6 +57,9 @@ PARAMETER_TYPE = "type"
 PARAMETER_INTERACTION_TYPE = "interaction_type"
 PARAMETER_USE_ROS_SERIALIZER = "use_ros_serializer"
 
+SERVICE_REQUEST_POSTFIX = "_mqtt_bridge_request"
+SERVICE_RESPONSE_POSTFIX = "_mqtt_bridge_response"
+
 
 class BridgeNode(Node):
     """Node to bridge MQTT and ROS."""
@@ -70,7 +74,9 @@ class BridgeNode(Node):
 
         if (len(args) != 2 and "--ros-args" not in args) or not (len(args) == 3 and
                                                                  "--ros-args" in args):
-            raise ValueError("To many arguments given")
+            msg = "To many arguments given"
+            self.get_logger().error(msg)
+            raise ValueError(msg)
 
         self.topics = self.topic_info_from_parameters(args[1])
 
@@ -85,16 +91,27 @@ class BridgeNode(Node):
         self.mqtt_client.loop_start()
 
         self.ros_publishers: dict[str, Publisher] = {}
+        self.ros_clients: dict[str, Client] = {}
 
         for topic_info in self.topics.values():
-            if topic_info.interaction_type == InteractionType.ROS_PUBLISHER:
-                publisher = self.create_publisher(topic_info.msg_type, topic_info.topic, 10)
-                self.ros_publishers[topic_info.topic] = publisher
-                self.mqtt_client.subscribe(topic_info.topic)
-            else:
-                callback = self.make_ros_callback(topic_info)
-                # TODO proper QOS?
-                self.create_subscription(topic_info.msg_type, topic_info.topic, callback, 10)
+            match topic_info.interaction_type:
+                case InteractionType.ROS_PUBLISHER:
+                    publisher = self.create_publisher(topic_info.msg_type, topic_info.topic, 10)
+                    self.ros_publishers[topic_info.topic] = publisher
+                    self.mqtt_client.subscribe(topic_info.topic)
+                case InteractionType.ROS_SUBSCRIBER:
+                    callback = self.make_ros_callback(topic_info)
+                    # TODO proper QOS?
+                    self.create_subscription(topic_info.msg_type, topic_info.topic, callback, 10)
+                case InteractionType.ROS_CLIENT:
+                    self.ros_clients[topic_info.topic] = \
+                        self.create_client(topic_info.topic, topic_info.topic)
+                case InteractionType.ROS_SERVER:
+                    pass  # TODO
+                case _:
+                    msg = f'Invalid interaction type {topic_info.interaction_type}'
+                    self.get_logger().error(msg)
+                    raise ValueError(msg)
 
         self.mqtt_client.on_message = self.mqtt_callback
 
@@ -122,7 +139,9 @@ class BridgeNode(Node):
 
             interaction_type_str = params[f"{name}.{PARAMETER_INTERACTION_TYPE}"].value
             if interaction_type_str not in INTERACTION_TYPES.keys():
-                raise ValueError(f'Interaction types must be one of {INTERACTION_TYPES.keys()}')
+                msg = f'Interaction types must be one of {INTERACTION_TYPES.keys()}'
+                self.get_logger().error(msg)
+                raise ValueError(msg)
 
             topic_infos[params[f"{name}.{PARAMETER_TOPIC}"].value] = TopicMsgInfo(
                 params[f"{name}.{PARAMETER_TOPIC}"].value,
@@ -152,7 +171,7 @@ class BridgeNode(Node):
     def mqtt_callback(self, _client: MQTT.Client,
                       _userdata: Any, mqtt_msg: MQTT.MQTTMessage) -> None:
         """
-        Re-publish messages from MQTT on the same topic in ROS.
+        Re-publish messages from MQTT on the same topic in ROS or 
 
         Parameters
         ----------
@@ -164,7 +183,14 @@ class BridgeNode(Node):
             the message received over MQTT
 
         """
-        topic_info = self.topics[mqtt_msg.topic]
+        if mqtt_msg.topic in self.topics:
+            topic_info = self.topics[mqtt_msg.topic]
+        elif mqtt_msg.topic + SERVICE_REQUEST_POSTFIX in self.topics:
+            topic_info = self.topics[mqtt_msg.topic + SERVICE_REQUEST_POSTFIX]
+        elif mqtt_msg.topic + SERVICE_RESPONSE_POSTFIX in self.topics:
+            topic_info = self.topics[mqtt_msg.topic + SERVICE_RESPONSE_POSTFIX]
+        else:
+            return  # Ignore MQTT messages on topics that weren't registered with us
 
         self.get_logger().info(
             f'MQTT RECEIVED: Topic: "{topic_info.topic}" Payload: "{mqtt_msg.payload!r}"')
@@ -176,7 +202,13 @@ class BridgeNode(Node):
                                    f'MQTT on topic "{mqtt_msg.topic}": "{mqtt_msg.payload!r}"')
             return
 
-        self.ros_publishers[topic_info.topic].publish(ros_msg)
+        if topic_info.interaction_type == InteractionType.ROS_PUBLISHER:
+            self.ros_publishers[topic_info.topic].publish(ros_msg)
+        elif topic_info.interaction_type == InteractionType.ROS_CLIENT:
+            request = topic_info.msg_type.Request()
+            future = self.ros_clients[topic_info.topic].call_async(request)
+            # TODO: send a message on topic + RESPONSE POSTFIX when this future returns
+        # TODO: server
 
 
 def main(args=None):
