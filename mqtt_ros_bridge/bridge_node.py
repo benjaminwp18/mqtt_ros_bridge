@@ -1,6 +1,8 @@
 import os
 import sys
 from typing import Any, Callable, Generic, cast
+# from queue import queue
+from enum import Enum
 
 import paho.mqtt.client as MQTT
 import rclpy
@@ -15,20 +17,35 @@ from mqtt_ros_bridge.serializer import JSONSerializer, ROSDefaultSerializer
 from mqtt_ros_bridge.util import lookup_message
 
 
+class InteractionType(Enum):
+    ROS_PUBLISHER = 1
+    ROS_SUBSCRIBER = 2
+    ROS_CLIENT = 3
+    ROS_SERVER = 4
+
+
+INTERACTION_TYPES: dict[str, InteractionType] = {
+    'ros_publisher': InteractionType.ROS_PUBLISHER,
+    'ros_subscriber': InteractionType.ROS_SUBSCRIBER,
+    'ros_client': InteractionType.ROS_CLIENT,
+    'ros_server': InteractionType.ROS_SERVER
+}
+
+
 class TopicMsgInfo(Generic[MsgLikeT]):
     """Metadata about a single topic."""
 
-    def __init__(self, topic: str, msg_object_path: str,
-                 publish_on_ros: bool, use_ros_serializer: bool = True) -> None:
+    def __init__(self, topic: str, msg_object_path: str, interaction_type: InteractionType,
+                 use_ros_serializer: bool = True) -> None:
 
         self.topic = topic
         self.msg_type: MsgLikeT = cast(MsgLikeT, lookup_message(msg_object_path))
-        self.publish_on_ros = publish_on_ros
+        self.interaction_type = interaction_type
         self.serializer = ROSDefaultSerializer if use_ros_serializer else JSONSerializer
 
     def __str__(self) -> str:
-        return (f"Topic: {self.topic}, Message Type: {self.msg_type}, Publish on ROS:"
-                f"{self.publish_on_ros}, Serializer: {self.serializer}")
+        return (f"Topic: {self.topic}, Message Type: {self.msg_type}, Type: "
+                f"{self.interaction_type}, Serializer: {self.serializer}")
 
 
 MQTT_PORT = 1883
@@ -36,7 +53,7 @@ MQTT_KEEPALIVE = 60
 
 PARAMETER_TOPIC = "topic"
 PARAMETER_TYPE = "type"
-PARAMETER_PUBLISH_ON_ROS = "publish_on_ros"
+PARAMETER_INTERACTION_TYPE = "interaction_type"
 PARAMETER_USE_ROS_SERIALIZER = "use_ros_serializer"
 
 
@@ -57,7 +74,8 @@ class BridgeNode(Node):
 
         self.topics = self.topic_info_from_parameters(args[1])
 
-        self.get_logger().info(str(self.topics))
+        for topic, topic_info in self.topics.items():
+            print(f'{topic}: {str(topic_info)}')
 
         self.get_logger().info('Creating MQTT ROS bridge node')
 
@@ -69,7 +87,7 @@ class BridgeNode(Node):
         self.ros_publishers: dict[str, Publisher] = {}
 
         for topic_info in self.topics.values():
-            if topic_info.publish_on_ros:
+            if topic_info.interaction_type == InteractionType.ROS_PUBLISHER:
                 publisher = self.create_publisher(topic_info.msg_type, topic_info.topic, 10)
                 self.ros_publishers[topic_info.topic] = publisher
                 self.mqtt_client.subscribe(topic_info.topic)
@@ -102,12 +120,16 @@ class BridgeNode(Node):
             else:
                 ros_serialiser = False
 
-            topic_infos[params[f"{name}.{PARAMETER_TOPIC}"].value] = (TopicMsgInfo(
+            interaction_type_str = params[f"{name}.{PARAMETER_INTERACTION_TYPE}"].value
+            if interaction_type_str not in INTERACTION_TYPES.keys():
+                raise ValueError(f'Interaction types must be one of {INTERACTION_TYPES.keys()}')
+
+            topic_infos[params[f"{name}.{PARAMETER_TOPIC}"].value] = TopicMsgInfo(
                 params[f"{name}.{PARAMETER_TOPIC}"].value,
                 params[f"{name}.{PARAMETER_TYPE}"].value,
-                params[f"{name}.{PARAMETER_PUBLISH_ON_ROS}"].value,
+                INTERACTION_TYPES[interaction_type_str],
                 ros_serialiser
-            ))
+            )
 
         return topic_infos
 

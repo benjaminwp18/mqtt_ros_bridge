@@ -3,10 +3,16 @@ mqtt_ros_bridge:
     turtle_pub: 
       topic: "/turtle1/cmd_vel"
       type: "geometry_msgs.msg:Twist"
-      publish_on_ros: False
+      interaction_type: "ros_publisher"
+    
+    # server: 
+    #   topic: "serverice"
+    #   type: "std_msgs.msg:String"
+    #   publish_or_client_on_ros: False
+    #   is_service: True
 
     yippee: 
       topic: "foo"
       type: "std_msgs.msg:String"
-      publish_on_ros: True
+      interaction_type: "ros_publisher"
       use_ros_serializer: True
