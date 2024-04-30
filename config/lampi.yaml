@@ -1,0 +1,6 @@
+mqtt_ros_bridge:
+  ros__parameters:
+    lampi: 
+      topic: "/devices/b827eb3d9134/lamp/set_config"
+      type: "lampi_msgs.msg:Lampi"
+      publish_on_ros: False
