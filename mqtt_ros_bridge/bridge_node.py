@@ -112,12 +112,14 @@ class BridgeNode(Node):
 
         for topic_info in self.topics.values():
             if topic_info.publish_on_ros:
-                publisher = self.create_publisher(topic_info.msg_type, topic_info.topic, topic_info.ros_qos)
+                publisher = self.create_publisher(topic_info.msg_type, topic_info.topic,
+                                                  topic_info.ros_qos)
                 self.ros_publishers[topic_info.topic] = publisher
                 self.mqtt_client.subscribe(topic_info.topic, qos=topic_info.mqtt_qos)
             else:
                 callback = self.make_ros_callback(topic_info)
-                self.create_subscription(topic_info.msg_type, topic_info.topic, callback, topic_info.ros_qos)
+                self.create_subscription(topic_info.msg_type, topic_info.topic, callback,
+                                         topic_info.ros_qos)
 
         self.mqtt_client.on_message = self.mqtt_callback
 
@@ -164,7 +166,8 @@ class BridgeNode(Node):
         """
         def callback(msg: MsgLikeT) -> None:
             self.get_logger().info(f'ROS RECEIVED: Topic: "{topic_info.topic}" Payload: "{msg}"')
-            self.mqtt_client.publish(topic_info.topic, topic_info.serializer.serialize(msg), topic_info.mqtt_qos)
+            self.mqtt_client.publish(topic_info.topic, topic_info.serializer.serialize(msg),
+                                     topic_info.mqtt_qos)
 
         return callback
 
