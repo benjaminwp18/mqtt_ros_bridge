@@ -38,8 +38,16 @@ def generate_launch_description() -> LaunchDescription:
         output='screen'
     )
 
+    rqt = Node(
+        package='rqt_gui',
+        executable='rqt_gui',
+        emulate_tty=True,
+        output='screen'
+    )
+
     return LaunchDescription([
         SetEnvironmentVariable("ROS_DOMAIN_ID", "1"),
         run_bridge_node,
-        turtle_sim
+        turtle_sim,
+        rqt
     ])
