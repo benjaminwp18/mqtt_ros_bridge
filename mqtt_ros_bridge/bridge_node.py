@@ -65,7 +65,7 @@ class TopicMsgInfo(Generic[MsgLikeT]):
         self.msg_type: MsgLikeT = cast(MsgLikeT, lookup_message(msg_object_path))
         self.publish_on_ros = publish_on_ros
         self.serializer = ROSDefaultSerializer if use_ros_serializer else JSONSerializer
-        self.ros_qos = QoSPresetProfilesInt.to_qos_profile(ros_qos)
+        self.ros_qos = QoSPresetProfilesInt.to_qos_profile(ros_qos).value
         self.mqtt_qos = mqtt_qos
 
     def __str__(self) -> str:
