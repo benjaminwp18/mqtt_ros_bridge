@@ -29,7 +29,7 @@ class QoSPresetProfilesInt(IntEnum):
     BEST_AVAILABLE = 8
 
     @staticmethod
-    def to_qos_profile(enum: int | 'QoSPresetProfilesInt') -> QoSPresetProfiles:
+    def to_qos_profile(enum: 'int | QoSPresetProfilesInt') -> QoSPresetProfiles:
         match enum:
             case QoSPresetProfilesInt.UNKNOWN:
                 return QoSPresetProfiles.UNKNOWN
