@@ -73,7 +73,7 @@ class TopicMsgInfo(Generic[MsgLikeT]):
                 f"{self.publish_on_ros}, Serializer: {self.serializer}")
 
 
-MQTT_PORT = 1883
+MQTT_PORT = 50001
 MQTT_KEEPALIVE = 60
 
 PARAMETER_TOPIC = "topic"
