@@ -207,6 +207,9 @@ def main(args=None):
 
     rclpy.spin(bridge_node)
 
+    bridge_node.mqtt_client.socket().shutdown()
+    bridge_node.mqtt_client.socket().close()
+
     bridge_node.destroy_node()
     rclpy.shutdown()
 
