@@ -117,7 +117,6 @@ class BridgeNode(Node):
                 self.mqtt_client.subscribe(topic_info.topic, qos=topic_info.mqtt_qos)
             else:
                 callback = self.make_ros_callback(topic_info)
-                # TODO proper QOS?
                 self.create_subscription(topic_info.msg_type, topic_info.topic, callback, topic_info.ros_qos)
 
         self.mqtt_client.on_message = self.mqtt_callback
