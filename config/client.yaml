@@ -1,0 +1,7 @@
+mqtt_ros_bridge:
+  ros__parameters:
+    srv_client:
+      topic: "service_topic"
+      type: "example_interfaces.srv:AddTwoInts"
+      interaction_type: "ros_client"
+      use_ros_serializer: False
