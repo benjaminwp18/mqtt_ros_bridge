@@ -31,10 +31,6 @@ you@ubuntu:~ $ service mosquitto status
 ```
 
 ## TODO
- - Set QOS
- - How to handle duplex topics?
- - Services
+ - ROS services
+ - ROS actions
  - Dynamic topic advertising
- - Actions
- - TopicInfo Hashable Key
- - Connection success message
